@@ -1,5 +1,5 @@
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: 'Poppins', sans-serif;
   margin: 0;
   padding: 0;
   text-align: center;
@@ -14,8 +14,17 @@ header {
 }
 
 header h1 {
-  font-size: 2.5rem;
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
   margin: 0;
+  color: #b30047;
+}
+
+header p {
+  font-size: 1.2rem;
+  font-weight: 300;
+  margin-top: 10px;
+  color: #444;
 }
 
 .gallery {
@@ -26,19 +35,20 @@ header h1 {
   max-width: 1000px;
   margin: 40px auto;
   align-items: center;
-  position: relative; /* for overlay heart */
+  position: relative;
 }
 
 .photo {
   position: relative;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  transition: transform 0.3s;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .photo:hover {
   transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
 }
 
 .photo img {
@@ -47,9 +57,36 @@ header h1 {
   display: block;
 }
 
+/* Style for photo titles */
 .photo h2 {
-  margin: 10px 0;
+  margin: 15px 0;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
   color: #c2185b;
+  letter-spacing: 1px;
+  position: relative;
+  display: inline-block;
+}
+
+/* Remove ugly blue link style */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Custom underline effect */
+.photo h2::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 2px;
+  background: #ff3366;
+  transition: width 0.3s;
+  margin: 5px auto 0;
+}
+
+.photo h2:hover::after {
+  width: 100%;
 }
 
 .photo.together {
@@ -59,7 +96,7 @@ header h1 {
 /* Overlay heart in middle of all 3 photos */
 .overlay-heart {
   position: absolute;
-  top: 33%;              /* adjust vertical placement */
+  top: 33%;  /* Adjust placement for middle of gallery */
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 30;
@@ -80,7 +117,7 @@ header h1 {
 
 .overlay-heart i:hover {
   transform: scale(1.25);
-  color: #c2185b;
+  color: #b30047;
 }
 
 /* Pulsing animation */
@@ -90,9 +127,17 @@ header h1 {
   100% { transform: scale(1); }
 }
 
-/* Media query: smaller heart on mobile */
+/* Media query: smaller heart + fonts on mobile */
 @media (max-width: 768px) {
   .overlay-heart i {
-    font-size: 120px;  /* smaller on mobile */
+    font-size: 120px;
+  }
+
+  header h1 {
+    font-size: 2rem;
+  }
+
+  .photo h2 {
+    font-size: 1.2rem;
   }
 }
