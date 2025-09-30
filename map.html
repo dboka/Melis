@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Our Map of Münster</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Memories in Münster 📍</h1>
+    <p>Click on a marker to see our memories 💕</p>
+    <p>Click anywhere on the map to add a new memory ✨</p>
+  </header>
+
+  <div id="map"></div>
+
+  <script>
+    // Izveido karti
+    const map = L.map('map').setView([51.9607, 7.6261], 13);
+
+    // Pamatkarte
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    // Popup HTML dizains
+    function createPopupHTML(title, imgUrl, description) {
+      return `
+        <div class="popup-card">
+          <h3>${title}</h3>
+          <img src="${imgUrl}" alt="${title}" />
+          <p>${description}</p>
+        </div>
+      `;
+    }
+
+    // Esošie markeri
+    L.marker([51.962, 7.628]).addTo(map)
+      .bindPopup(createPopupHTML("Our first memory 💕", "photos/Together1.jpg", "This was a very special day in Münster."));
+
+    L.marker([51.965, 7.62]).addTo(map)
+      .bindPopup(createPopupHTML("Another special place", "photos/Together2.jpg", "Here we walked together and laughed a lot ❤️"));
+
+    // Klikšķis uz kartes → jauns markeris
+    map.on("click", function(e) {
+      const lat = e.latlng.lat;
+      const lng = e.latlng.lng;
+
+      const title = prompt("Enter a title for this memory:");
+      if (!title) return;
+
+      const imgUrl = prompt("Enter image URL (example: photos/NewPhoto.jpg):");
+      if (!imgUrl) return;
+
+      const description = prompt("Enter a short description:");
+      if (!description) return;
+
+      L.marker([lat, lng]).addTo(map)
+        .bindPopup(createPopupHTML(title, imgUrl, description))
+        .openPopup();
+    });
+  </script>
+</body>
+</html>

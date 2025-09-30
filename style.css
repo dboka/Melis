@@ -57,7 +57,6 @@ header p {
   display: block;
 }
 
-/* Style for photo titles */
 .photo h2 {
   margin: 15px 0;
   font-family: 'Playfair Display', serif;
@@ -68,13 +67,13 @@ header p {
   display: inline-block;
 }
 
-/* Remove ugly blue link style */
+/* Remove ugly blue link */
 a {
   text-decoration: none;
   color: inherit;
 }
 
-/* Custom underline effect */
+/* Pink underline animation */
 .photo h2::after {
   content: "";
   display: block;
@@ -93,10 +92,10 @@ a {
   grid-column: 1 / span 2;
 }
 
-/* Overlay heart in middle of all 3 photos */
+/* Overlay heart in middle of gallery */
 .overlay-heart {
   position: absolute;
-  top: 33%;  /* Adjust placement for middle of gallery */
+  top: 33%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 30;
@@ -127,7 +126,16 @@ a {
   100% { transform: scale(1); }
 }
 
-/* Media query: smaller heart + fonts on mobile */
+/* Map style */
+#map {
+  height: 500px;
+  width: 90%;
+  margin: 20px auto;
+  border-radius: 15px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+/* Responsive */
 @media (max-width: 768px) {
   .overlay-heart i {
     font-size: 120px;
@@ -141,3 +149,44 @@ a {
     font-size: 1.2rem;
   }
 }
+/* Kartes izskats */
+#map {
+  height: 600px;
+  width: 90%;
+  margin: 20px auto;
+  border-radius: 15px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+/* Popup dizains */
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.popup-card {
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+}
+
+.popup-card h3 {
+  margin: 5px 0 10px;
+  font-size: 1.2rem;
+  color: #c2185b;
+}
+
+.popup-card img {
+  width: 220px;
+  max-height: 160px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  margin-bottom: 8px;
+}
+
+.popup-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #444;
+}
+
