@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catch If You Can 🎯</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- ====== GAME CSS ====== -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #ff6b6b 75%, #4ecdc4 100%);
+      background-size: 400% 400%;
+      animation: bgShift 15s ease-in-out infinite;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    @keyframes bgShift {
+      0%,100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .game-screen {
+      width: 95vw;
+      max-width: 1200px;
+      height: 95vh;
+      background: rgba(255,255,255,0.9);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      position: relative;
+    }
+
+    .header { text-align: center; }
+    .game-title {
+      font-size: 2.2em;
+      font-weight: 900;
+      background: linear-gradient(45deg,#667eea,#ff6b6b,#4ecdc4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle { color: #444; }
+
+    .stats-panel {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 10px 0;
+    }
+    .stat-card {
+      background: #fff;
+      padding: 10px 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+    .stat-label { font-size: 0.9em; color:#555; }
+    .stat-value { font-size: 1.6em; font-weight: bold; color:#ff3366; }
+
+    .game-area {
+      flex: 1;
+      background: linear-gradient(135deg,#f093fb,#4ecdc4);
+      border-radius: 15px;
+      position: relative;
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    .game-instructions {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      text-align: center;
+      color: white;
+    }
+    .instruction-text { font-size: 1.4em; margin-bottom: 15px; }
+
+    .control-button {
+      background: linear-gradient(45deg,#667eea,#ff6b6b);
+      border: none; border-radius: 25px;
+      padding: 12px 25px;
+      color: white;
+      font-size: 1.1em;
+      cursor: pointer;
+    }
+    .control-button:hover { transform: scale(1.05); }
+
+    .flying-emoji {
+      position: absolute;
+      font-size: 2em;
+      cursor: pointer;
+      user-select: none;
+      animation: float 2s ease-in-out infinite alternate;
+    }
+    @keyframes float { from { transform: translateY(0);} to { transform: translateY(-8px);} }
+
+    .game-over-screen {
+      position: absolute;
+      top:0; left:0; right:0; bottom:0;
+      background: rgba(0,0,0,0.85);
+      border-radius: 15px;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    .game-over-screen.show { display:flex; }
+    .game-over-title { font-size: 2em; margin-bottom: 15px; }
+    .game-over-message { font-size: 1.2em; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+  <div class="game-screen">
+    <div class="header">
+      <a href="index.html" style="text-decoration:none;color:#ff3366;font-weight:bold;">⬅ Back</a>
+      <h1 class="game-title">Catch If You Can 🎯</h1>
+      <p class="subtitle">Catch 15 emojis before time runs out!</p>
+    </div>
+
+    <div class="stats-panel">
+      <div class="stat-card">
+        <div class="stat-label">Caught</div>
+        <div class="stat-value" id="caughtCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Time</div>
+        <div class="stat-value" id="timeLeft">30</div>
+      </div>
+    </div>
+
+    <div class="game-area" id="gameArea">
+      <div class="game-instructions" id="instructions">
+        <div class="instruction-text">Ready to catch some emojis?</div>
+        <div>👩🏼 🍕 🍆 🍑 🍒 🍌 🍻 🍷</div>
+        <button class="control-button" onclick="startGame()" id="startButton">🚀 Start Game</button>
+      </div>
+    </div>
+
+    <div class="game-over-screen" id="gameOverScreen">
+      <h2 class="game-over-title" id="gameOverTitle">Game Over</h2>
+      <p class="game-over-message" id="gameOverMessage"></p>
+      <button class="control-button" onclick="resetGame()">🎮 Play Again</button>
+    </div>
+  </div>
+
+  <!-- ====== GAME SCRIPT ====== -->
+  <script>
+    let gameState = {
+      caught: 0,
+      timeLeft: 30,
+      isActive: false,
+      timer: null,
+      spawn: null,
+      categories: { pizza:0, alcohol:0, fruitVeg:0, girl:0 }
+    };
+
+    const emojis = ['🍕','🍕','🍕','👩🏼','👩🏼','🍆','🍑','🍒','🍌','🍻','🍷'];
+
+    function updateDisplay() {
+      document.getElementById('caughtCount').textContent = gameState.caught;
+      document.getElementById('timeLeft').textContent = gameState.timeLeft;
+    }
+
+    function startGame() {
+      gameState.isActive = true;
+      gameState.caught = 0;
+      gameState.timeLeft = 30;
+      gameState.categories = { pizza:0, alcohol:0, fruitVeg:0, girl:0 };
+      document.getElementById('instructions').style.display = 'none';
+      updateDisplay();
+
+      gameState.timer = setInterval(() => {
+        gameState.timeLeft--;
+        updateDisplay();
+        if (gameState.timeLeft <= 0 || gameState.caught >= 15) endGame();
+      }, 1000);
+
+      gameState.spawn = setInterval(createFlyingEmoji, 900);
+    }
+
+    function createFlyingEmoji() {
+      if (!gameState.isActive) return;
+      const gameArea = document.getElementById('gameArea');
+      const emoji = document.createElement('div');
+      emoji.className = 'flying-emoji';
+      const type = emojis[Math.floor(Math.random()*emojis.length)];
+      emoji.textContent = type;
+      emoji.style.top = Math.random()*(gameArea.offsetHeight-40)+'px';
+      emoji.style.left = Math.random()*(gameArea.offsetWidth-40)+'px';
+      emoji.onclick = () => catchEmoji(emoji,type);
+      gameArea.appendChild(emoji);
+      setTimeout(()=>emoji.remove(),4000);
+    }
+
+    function catchEmoji(el,type) {
+      if (!gameState.isActive) return;
+      gameState.caught++;
+      if (type==='🍕') gameState.categories.pizza++;
+      if (type==='🍻'||type==='🍷') gameState.categories.alcohol++;
+      if (['🍆','🍑','🍒','🍌'].includes(type)) gameState.categories.fruitVeg++;
+      if (type==='👩🏼') gameState.categories.girl++;
+      updateDisplay();
+      el.remove();
+      if (gameState.caught>=15) endGame();
+    }
+
+    function endGame() {
+      gameState.isActive=false;
+      clearInterval(gameState.timer);
+      clearInterval(gameState.spawn);
+
+      let title='🎉 Game Over 🎉';
+      let message=`You caught ${gameState.caught} emojis!`;
+      const max = Math.max(gameState.categories.pizza, gameState.categories.alcohol, gameState.categories.fruitVeg, gameState.categories.girl);
+
+      if (gameState.caught>=15) {
+        if (gameState.categories.pizza===max && max>0) {
+          title='🍕 Pizza Lover! 🍕';
+          message='You are obese, go to gym…';
+        } else if (gameState.categories.alcohol===max && max>0) {
+          title='🍻 Alcohol King 🍻';
+          message='You alcoholic! Stop drinking immediately!';
+        } else if (gameState.categories.fruitVeg===max && max>0) {
+          title='🍑 Fruity Mood 🍑';
+          message='You are HORNY and miss your girlfriend a lot! 😏';
+        } else if (gameState.categories.girl===max && max>0) {
+          title='👩🏼 True Love 👩🏼';
+          message='You only have eyes for Melis 💕 She loves you so much!';
+        }
+      }
+
+      document.getElementById('gameOverTitle').textContent=title;
+      document.getElementById('gameOverMessage').textContent=message;
+      document.getElementById('gameOverScreen').classList.add('show');
+    }
+
+    function resetGame() {
+      gameState.caught=0;
+      gameState.timeLeft=30;
+      document.getElementById('gameOverScreen').classList.remove('show');
+      document.getElementById('instructions').style.display='block';
+      document.getElementById('gameArea').innerHTML='<div class="game-instructions" id="instructions"><div class="instruction-text">Ready to catch some emojis?</div><div>👩🏼 🍕 🍆 🍑 🍒 🍌 🍻 🍷</div><button class="control-button" onclick="startGame()" id="startButton">🚀 Start Game</button></div>';
+      updateDisplay();
+    }
+
+    updateDisplay();
+  </script>
+</body>
+</html>
